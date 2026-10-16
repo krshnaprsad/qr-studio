@@ -29,9 +29,10 @@ assert.deepStrictEqual(Q.warnings({ fg: "#000000", bg: "#ffffff" }, 20), []);
 Object.keys(Q.SHAPE_NAMES).forEach(d => { assert.ok(Q.shapePath(d).startsWith("M"), d); Object.keys(Q.EYE_NAMES).forEach(e => { const s = Q.svg("https://a.com/x", { dots: d, eyes: e, logo: "data:image/png;base64,AAAA" }); assert.ok(!/NaN|undefined|Infinity/.test(s), d + e); assert.ok(s.endsWith("</svg>")); }); });
 assert.ok(Object.keys(Q.SHAPE_NAMES).length >= 11 && Object.keys(Q.EYE_NAMES).length >= 5);
 // decorative shapes warn, the reliable ones do not
-["diamond", "small", "plus", "star", "heart"].forEach(d => assert.ok(Q.warnings({ fg: "#000000", bg: "#ffffff", dots: d }, 20).some(w => /decorative/.test(w)), d));
-["square", "rounded", "dots", "leaf", "vbars", "hbars"].forEach(d => assert.ok(!Q.warnings({ fg: "#000000", bg: "#ffffff", dots: d }, 20).some(w => /decorative/.test(w)), d));
+["diamond", "hbars", "plus", "star", "heart"].forEach(d => assert.ok(Q.warnings({ fg: "#000000", bg: "#ffffff", dots: d }, 20).some(w => /decorative/.test(w)), d));
+["square", "rounded", "dots", "leaf", "vbars", "small"].forEach(d => assert.ok(!Q.warnings({ fg: "#000000", bg: "#ffffff", dots: d }, 20).some(w => /decorative/.test(w)), d));
 assert.ok(Q.warnings({ fg: "#000000", bg: "#ffffff", dots: "star" }, 200).some(w => /shorten/.test(w)));
 // the three corner squares are kept clear of dot shapes: same corner pixels whatever the dot shape
 assert.strictEqual(Q.svg("a", { dots: "star" }).split('fill-rule="evenodd"')[1].split("/>")[0], Q.svg("a", { dots: "square" }).split('fill-rule="evenodd"')[1].split("/>")[0]);
 console.log("qr tests passed");
+assert.ok(Q.isInverted({ fg: "#ffffff", bg: "#000000" }) && !Q.isInverted({ fg: "#000000", bg: "#ffffff" }));
