@@ -16,17 +16,47 @@
     return { text: val("#text") };
   }
   function opts() {
-    return { fg: val("#fg"), bg: val("#bg"), transparent: $("#tr").checked, dots: shape.dots, eyes: shape.eyes, eyeColor: ecReset ? "" : val("#ec"), margin: +val("#margin"), ecc: "M", logo: logo, logoSize: +val("#lsize") };
+    return { fg: val("#fg"), bg: val("#bg"), transparent: $("#tr").checked, dots: shape.dots, eyes: shape.eyes, eyeColor: ecReset ? "" : val("#ec"), margin: +val("#margin"), ecc: "Q", logo: logo, logoSize: +val("#lsize") };
   }
   function msg(t) { var m = $("#msg"); m.hidden = !t; m.textContent = t || ""; if (t) setTimeout(function () { m.hidden = true; }, 3000); }
-  var cur = "";
+  var cur = "", chkId = 0;
+  // Read the finished code back with a software decoder (jsQR). This is one decoder, not a real phone.
+  function readBack(svg, px, mode) {
+    return new Promise(function (res) {
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var c = document.createElement("canvas"); c.width = c.height = px; var g = c.getContext("2d");
+          g.fillStyle = "#fff"; g.fillRect(0, 0, px, px); g.imageSmoothingEnabled = false; g.drawImage(img, 0, 0, px, px);
+          var d = g.getImageData(0, 0, px, px), r = window.jsQR(d.data, px, px, { inversionAttempts: mode });
+          res(r ? r.data : null);
+        } catch (e) { res(null); }
+      };
+      img.onerror = function () { res(null); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    });
+  }
+  function runCheck(svg, text, o) {
+    var id = ++chkId, box = $("#chk"), inv = !o.transparent && QRS.isInverted(o);
+    box.className = "chk"; box.textContent = "Checking the code...";
+    if (!window.jsQR) { box.textContent = ""; return; }
+    Promise.all([readBack(svg, 300, "dontInvert"), readBack(svg, 520, "dontInvert"), readBack(svg, 300, "onlyInvert")]).then(function (r) {
+      if (id !== chkId) return;
+      var good = r[0] === text, good2 = r[1] === text, viaInvert = r[2] === text, n = (good ? 1 : 0) + (good2 ? 1 : 0), m;
+      if (inv) { box.className = "chk bad"; m = viaInvert || n ? "Light on dark: my check can read it only by trying it inverted. Many phones do not do that, so it may not scan. Use Swap colours." : "May not scan. This is light on dark and my check could not read it. Use Swap colours."; }
+      else if (n === 2) { box.className = "chk good"; m = "Scans OK in my in-browser check. That is one software reader, so still try it on your phone."; }
+      else if (n === 1) { box.className = "chk bad"; m = "Borderline. My check read it at one size and not the other. Try a plainer dot shape, a darker colour, or a bigger border."; }
+      else { box.className = "chk bad"; m = "May not scan. My check could not read it. Try square dots, a darker code colour, a lighter background, or a smaller logo."; }
+      box.textContent = m;
+    });
+  }
   function render() {
     var text = QRS.payload(kind, fields()), o = opts(), art = $("#art"), w = $("#warn");
     var empty = kind === "wifi" ? !val("#ssid") : kind === "email" ? !val("#eto") : kind === "phone" ? !val("#pnum") : !text.trim();
     $("#box").style.background = o.transparent ? "repeating-conic-gradient(#1a1a1a 0 25%,#2a2a2a 0 50%) 0 0/16px 16px" : "";
-    if (empty) { cur = ""; art.innerHTML = '<p class="note empty">Type something on the left and the code appears here.</p>'; w.innerHTML = ""; setDl(false); return; }
+    if (empty) { cur = ""; art.innerHTML = '<p class="note empty">Type something on the left and the code appears here.</p>'; w.innerHTML = ""; $("#chk").textContent = ""; chkId++; setDl(false); return; }
     try { cur = QRS.svg(text, o); } catch (e) { cur = ""; art.innerHTML = '<p class="note empty">That is too much for one QR code. Shorten it.</p>'; w.innerHTML = ""; setDl(false); return; }
-    art.innerHTML = cur; setDl(true);
+    art.innerHTML = cur; setDl(true); runCheck(cur, text, Object.assign({}, o, { ecc: o.logo ? "H" : o.ecc }));
     var list = QRS.warnings(Object.assign({}, o, { ecc: o.logo ? "H" : o.ecc }), text.length);
     var inv = !o.transparent && QRS.isInverted(o);
     w.innerHTML = list.length ? '<ul class="warn">' + list.map(function (x) { return "<li>" + x.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</li>"; }).join("") + "</ul>" : '<p class="ok">No problems spotted. Still scan it with your phone before you print it.</p>';
