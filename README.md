@@ -22,8 +22,10 @@ Or download the repo and open `index.html`. Nothing to install and nothing leave
 
 - **Always scan it before you print it.** The tool warns about the usual problems (colours too close, a light code on a dark background, a logo that is too big) but a warning is a guess, and only a real phone tells you the truth. Test on more than one phone if it matters.
 - **A logo hides part of the code.** When you add one I switch the code to its highest repair level so it still reads. Above about a quarter of the width it often stops scanning.
-- **Some shapes read better than others.** Square, rounded, round dots, leaf, vertical bars and horizontal bars were reliable in my tests. Diamond, small squares, plus, star and heart are decorative. They looked great but failed more often, so the tool warns you when you pick one. Corner shapes circle, cut and leaf were less reliable in a second decoder (OpenCV), so scan those before you print.
-- **Light on dark often fails.** My decoder tests failed on a green-on-black leaf code, and many phone scanners reject inverted codes. The tool warns and has a Swap colours button. Corner shapes circle, cut and leaf are also less reliable in some decoders, so scan before you print.
+- **There is a live scan check.** Under the preview I read your finished code back with a software reader and tell you if it scans or may not. It is one reader, not a phone, so a green tick is a good sign and not a promise.
+- **Some shapes read better than others.** Square, rounded, round dots, small squares, leaf and vertical bars read back every time in my tests. Diamond, horizontal bars, plus, star and heart are decorative and failed more often, so the tool warns you when you pick one.
+- **Light on dark is risky.** Many phone scanners skip codes that are lighter than their background. My test readers only got them when I let them try inverted. The tool warns you and has a Swap colours button that gives you a dark code on a light background.
+- **Repair level is Q by default,** so a code survives some damage or a fancy shape. Adding a logo switches it to H.
 - **A QR code can only hold so much.** If the text is too long you get a message and no code.
 - **A Wi-Fi code holds the password in plain text.** Anyone who scans it can join. Share it only where that is fine.
 - **These codes do not expire and do not track anything.** The link or text is written straight into the picture. If you need a code you can change later or count scans on, that needs a service, and this is not one.
@@ -31,18 +33,27 @@ Or download the repo and open `index.html`. Nothing to install and nothing leave
 
 ## How I checked it
 
-The tests cover what gets written into each kind of code, every shape, and the warnings. Separately, I rendered every dot shape and every corner shape, with and without a logo, on four different texts, and decoded each one with jsQR, a free reader. I did it three ways: sharp at 300 and 200 pixels, and at 600 pixels with a slight blur to act like a camera.
+The tests cover what gets written into each kind of code, every shape, and the warnings. Separately I drew each shape as a PNG at 1024, 400 and 250 pixels, in black on white and in green (#6aa32f) on white, with a phone number as the text. I read each one with three free readers: jsQR, zxing and OpenCV. Results are reads out of attempts:
 
-- Square, rounded, round dots, leaf, vertical bars and horizontal bars: 144 of 144 read back exactly.
-- Corner shapes: 120 of 120 with jsQR. A second decoder (OpenCV) struggled with circle and cut corners, and sometimes with leaf corners together with leaf dots.
-- Diamond, small squares, plus, star and heart: 100 of 120. Plus and star failed the most, and some shapes only failed with a logo or at one size.
+| Dot shape | OpenCV | zxing | jsQR |
+|---|---|---|---|
+| Square, rounded, round dots, small squares, vertical bars | 12/12 | 12/12 | 12/12 |
+| Leaf | 12/12 | 12/12 | 10/12 |
+| Diamond | 12/12 | 12/12 | 8/12 |
+| Star | 12/12 | 12/12 | 8/12 |
+| Heart | 10/12 | 12/12 | 7/12 |
+| Plus | 8/12 | 12/12 | 6/12 |
+| Horizontal bars | 8/12 | 10/12 | 9/12 |
 
-jsQR is a stricter reader than most phone cameras in some ways and weaker in others, so these numbers are a guide, not a promise. A real phone is still the final test, and I have not tried one.
+Corner shapes (square, rounded, circle, leaf, cut) were tested with square dots and with leaf dots, in black, green, dark green, green on black and white on black. OpenCV and zxing read all of them. jsQR read 27 of 30 for each, and the misses were the 1024 pixel leaf-dot renders. The inverted ones (light on dark) were only read when the reader was allowed to try inverting, which many phones do not do.
+
+I made the circle, cut and leaf corners less extreme in v1.2 because OpenCV could not read the older, rounder ones. Those readers are stricter than a phone camera in some ways and looser in others, so treat this as a guide. I have not tried it on a real phone.
 
 ## Files
 
 - `index.html`, `web/` the app
 - `src/qr.js` the code that builds the SVG, the warnings and what goes into each code
+- `vendor/jsqr.js` the reader behind the live scan check (jsQR, Apache 2.0, Cosmo Wolfe)
 - `vendor/qrcode.js` the QR maths, from the free qrcode-generator library (MIT, Kazuhiko Arase). See `vendor/NOTICE.md`
 - `tests/` the tests
 
