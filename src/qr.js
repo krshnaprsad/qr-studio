@@ -38,13 +38,15 @@
   function lum(c) { var h = hex(c); if (!h) return 0; var v = [0, 2, 4].map(function (i) { var x = parseInt(h.substr(i, 2), 16) / 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; }
   function contrast(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
 
+  function isInverted(o) { return lum(o.fg) > lum(o.bg); }
+
   // Plain language warnings about things that stop codes scanning
   function warnings(o, textLength) {
     var w = [];
     var cr = contrast(o.fg, o.bg);
     if (!o.transparent && cr < 3) w.push("The colours are too close (contrast " + cr.toFixed(1) + " to 1). Many phones will not scan this. Make the code darker or the background lighter.");
     else if (!o.transparent && cr < 4.5) w.push("Contrast is on the low side (" + cr.toFixed(1) + " to 1). It may scan on new phones and fail on older ones. Test it.");
-    if (!o.transparent && lum(o.fg) > lum(o.bg)) w.push("Light code on a dark background is inverted. Some scanners cannot read inverted codes. Test it on more than one phone.");
+    if (!o.transparent && lum(o.fg) > lum(o.bg)) w.push("Light code on a dark background is inverted. Many scanners misread or reject inverted codes, and my own tests with three decoders mostly failed on them. Use the Swap colours button to get a dark code on a light background.");
     if (o.logo && o.logoSize > 24) w.push("A big logo hides part of the code. Above about 24 percent it often stops scanning. Make it smaller if a phone struggles.");
     if (o.logo && o.ecc !== "H") w.push("With a logo the code needs the highest repair level (H). Switch it on.");
     if (FANCY[o.dots]) w.push("The " + SHAPE_NAMES[o.dots].toLowerCase() + " shape is decorative and harder for a phone to read than the plain ones. Scan it on your phone before you use it" + (textLength > 120 ? ", and shorten the text if it fails" : "") + ".");
@@ -126,5 +128,5 @@
     return out + "</svg>";
   }
 
-  return { SHAPE_NAMES: SHAPE_NAMES, EYE_NAMES: EYE_NAMES, FANCY: FANCY, shapePath: shapePath, eyePath: eyePath, payload: payload, matrix: matrix, svg: svg, contrast: contrast, warnings: warnings, DEF: DEF };
+  return { SHAPE_NAMES: SHAPE_NAMES, EYE_NAMES: EYE_NAMES, FANCY: FANCY, shapePath: shapePath, eyePath: eyePath, payload: payload, matrix: matrix, svg: svg, contrast: contrast, isInverted: isInverted, warnings: warnings, DEF: DEF };
 });
