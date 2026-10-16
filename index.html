@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Studio</title>
+<link rel="stylesheet" href="web/app.css">
+</head>
+<body>
+<header class="hd"><span class="logo" role="img" aria-label="Zero3 Creatives"></span><div><h1>QR Studio</h1><p class="tag">QR codes with your colours and your logo</p></div><span class="ver">v1.0</span></header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>1. What should it open?</h2>
+      <div class="tabs" id="tabs"><button class="tab on" data-k="url">Link or text</button><button class="tab" data-k="wifi">Wi-Fi</button><button class="tab" data-k="email">Email</button><button class="tab" data-k="phone">Phone</button></div>
+      <div class="pane" data-k="url"><label>Link or text<textarea id="text" rows="3" spellcheck="false" placeholder="https://yourname.com"></textarea></label></div>
+      <div class="pane" data-k="wifi" hidden><label>Network name<input id="ssid" autocomplete="off"></label><label>Password<input id="wpass" autocomplete="off"></label><label>Security<select id="wsec"><option value="WPA">WPA or WPA2 (most routers)</option><option value="WEP">WEP (very old)</option><option value="none">No password</option></select></label><label class="chk"><input type="checkbox" id="whid"> Hidden network</label><p class="note">Anyone who scans this code can join the network. Only put it somewhere you are happy to share the Wi-Fi.</p></div>
+      <div class="pane" data-k="email" hidden><label>To<input id="eto" type="email"></label><label>Subject (optional)<input id="esub"></label><label>Message (optional)<textarea id="ebody" rows="2"></textarea></label></div>
+      <div class="pane" data-k="phone" hidden><label>Phone number<input id="pnum" placeholder="+971 50 123 4567"></label></div>
+
+      <h2 class="gap">2. Style</h2>
+      <div class="fields">
+        <label>Code colour<input type="color" id="fg" value="#000000"></label>
+        <label>Background<input type="color" id="bg" value="#ffffff"></label>
+        <label>Corner colour<span class="inl"><input type="color" id="ec" value="#000000"><button class="lnk" id="ecreset">same as code</button></span></label>
+        <label>Dots<select id="dots"><option value="square">Square</option><option value="rounded">Rounded</option><option value="dots">Round dots</option></select></label>
+        <label>Corners<select id="eyes"><option value="square">Square</option><option value="rounded">Rounded</option><option value="circle">Circle</option></select></label>
+        <label>Border<select id="margin"><option value="2">Thin</option><option value="4" selected>Normal</option><option value="6">Wide</option></select></label>
+      </div>
+      <label class="chk"><input type="checkbox" id="tr"> Transparent background (PNG and SVG)</label>
+
+      <h2 class="gap">3. Logo (optional)</h2>
+      <div class="row"><input id="logo" type="file" accept="image/*" hidden><button class="btn" id="logobtn">Add a logo</button><button class="btn" id="logoclear" hidden>Remove logo</button><label class="rng" id="lsw" hidden>Size <input type="range" id="lsize" min="10" max="30" value="20"><span id="lval">20%</span></label></div>
+      <p class="note">The logo sits in the middle and hides a little of the code. The repair level is set to the highest (H) so the code can still be read. Keep the logo small and always test the result with your phone.</p>
+    </section>
+    <section class="card prev">
+      <h2>Your code</h2>
+      <div class="box" id="box"><div id="art"></div></div>
+      <div id="warn"></div>
+      <div class="row"><button class="btn go" id="dpng">Download PNG</button><button class="btn" id="dsvg">Download SVG</button><select id="psize" class="sm" aria-label="PNG size"><option value="512">512 px</option><option value="1024" selected>1024 px</option><option value="2048">2048 px</option></select></div>
+      <p class="note">SVG stays sharp at any size, use it for print. PNG is for screens and chat apps.</p>
+      <p id="msg" class="msg" hidden></p>
+    </section>
+  </div>
+  <p class="foot">Everything runs in your browser. What you type and the logo you add are not sent anywhere. Made by Zero3. <a href="https://github.com/krshnaprsad/qr-studio" target="_blank" rel="noopener">Source on GitHub</a></p>
+</main>
+<script src="vendor/qrcode.js"></script>
+<script src="src/qr.js"></script>
+<script src="web/app.js"></script>
+</body>
+</html>
