@@ -47,6 +47,7 @@
     if (!o.transparent && cr < 3) w.push("The colours are too close (contrast " + cr.toFixed(1) + " to 1). Many phones will not scan this. Make the code darker or the background lighter.");
     else if (!o.transparent && cr < 4.5) w.push("Contrast is on the low side (" + cr.toFixed(1) + " to 1). It may scan on new phones and fail on older ones. Test it.");
     if (!o.transparent && lum(o.fg) > lum(o.bg)) w.push("Light code on a dark background is inverted. Many scanners misread or reject inverted codes, and my own tests with three decoders mostly failed on them. Use the Swap colours button to get a dark code on a light background.");
+    if (o.margin !== undefined && +o.margin < 4) w.push("The border is thinner than the 4 squares scanners expect around a code. Pick Normal or Wide if it fails to scan.");
     if (o.logo && o.logoSize > 24) w.push("A big logo hides part of the code. Above about 24 percent it often stops scanning. Make it smaller if a phone struggles.");
     if (o.logo && o.ecc !== "H") w.push("With a logo the code needs the highest repair level (H). Switch it on.");
     if (FANCY[o.dots]) w.push("The " + SHAPE_NAMES[o.dots].toLowerCase() + " shape is decorative and harder for a phone to read than the plain ones. Scan it on your phone before you use it" + (textLength > 120 ? ", and shorten the text if it fails" : "") + ".");
@@ -64,9 +65,9 @@
       case "diamond": return P([[0.5, -0.12], [1.12, 0.5], [0.5, 1.12], [-0.12, 0.5]]);
       case "vbars": return P([[0.12, 0], [0.88, 0], [0.88, 1], [0.12, 1]]);
       case "hbars": return P([[0, 0.12], [1, 0.12], [1, 0.88], [0, 0.88]]);
-      case "small": return P([[0.1, 0.1], [0.9, 0.1], [0.9, 0.9], [0.1, 0.9]]);
-      case "plus": return P([[0.28, 0], [0.72, 0], [0.72, 0.28], [1, 0.28], [1, 0.72], [0.72, 0.72], [0.72, 1], [0.28, 1], [0.28, 0.72], [0, 0.72], [0, 0.28], [0.28, 0.28]]);
-      case "star": { var pts = []; for (var i = 0; i < 10; i++) { var r = i % 2 ? 0.34 : 0.78, an = -Math.PI / 2 + i * Math.PI / 5; pts.push([0.5 + r * Math.cos(an), 0.54 + r * Math.sin(an)]); } return P(pts); }
+      case "small": return P([[0.05, 0.05], [0.95, 0.05], [0.95, 0.95], [0.05, 0.95]]);
+      case "plus": return P([[0.2, 0], [0.8, 0], [0.8, 0.2], [1, 0.2], [1, 0.8], [0.8, 0.8], [0.8, 1], [0.2, 1], [0.2, 0.8], [0, 0.8], [0, 0.2], [0.2, 0.2]]);
+      case "star": { var pts = []; for (var i = 0; i < 10; i++) { var r = i % 2 ? 0.45 : 0.85, an = -Math.PI / 2 + i * Math.PI / 5; pts.push([0.5 + r * Math.cos(an), 0.52 + r * Math.sin(an)]); } return P(pts); }
       case "heart": return "M" + X(0.5) + " " + Y(1.02) + "C" + X(-0.2) + " " + Y(0.6) + " " + X(-0.08) + " " + Y(-0.02) + " " + X(0.28) + " " + Y(0.0) + "C" + X(0.42) + " " + Y(0.0) + " " + X(0.5) + " " + Y(0.12) + " " + X(0.5) + " " + Y(0.24) + "C" + X(0.5) + " " + Y(0.12) + " " + X(0.58) + " " + Y(0.0) + " " + X(0.72) + " " + Y(0.0) + "C" + X(1.08) + " " + Y(-0.02) + " " + X(1.2) + " " + Y(0.6) + " " + X(0.5) + " " + Y(1.02) + "z";
       case "leaf": return "M" + X(0.5) + " " + y + "H" + X(1) + "V" + Y(0.5) + "A" + f(0.5) + " " + f(0.5) + " 0 0 1 " + X(0.5) + " " + Y(1) + "H" + x + "V" + Y(0.5) + "A" + f(0.5) + " " + f(0.5) + " 0 0 1 " + X(0.5) + " " + y + "z";
     }
@@ -76,12 +77,11 @@
   function eye(x, y, st) {
     var ring, mid;
     if (st === "circle") {
-      ring = "M" + (x + 3.5) + " " + y + "a3.5 3.5 0 1 0 .001 0zM" + (x + 3.5) + " " + (y + 1) + "a2.5 2.5 0 1 1 -.001 0z";
-      mid = "M" + (x + 3.5) + " " + (y + 2) + "a1.5 1.5 0 1 0 .001 0z";
+      ring = rr(x, y, 7, 2.1) + rr(x + 1, y + 1, 5, 1.2); mid = rr(x + 2, y + 2, 3, 0.9);
     } else if (st === "leaf") {
-      ring = lf(x, y, 7, 2.6) + lf(x + 1, y + 1, 5, 1.8); mid = lf(x + 2, y + 2, 3, 1);
+      ring = lf(x, y, 7, 1.6) + lf(x + 1, y + 1, 5, 0.9); mid = lf(x + 2, y + 2, 3, 0.6);
     } else if (st === "cut") {
-      ring = ct(x, y, 7, 1.6) + ct(x + 1, y + 1, 5, 1); mid = ct(x + 2, y + 2, 3, 0.6);
+      ring = ct(x, y, 7, 0.7) + ct(x + 1, y + 1, 5, 0.4); mid = ct(x + 2, y + 2, 3, 0.3);
     } else if (st === "rounded") {
       var o = rr(x, y, 7, 1.8), i = rr(x + 1, y + 1, 5, 1.1);
       ring = o + i; mid = rr(x + 2, y + 2, 3, 0.8);
@@ -97,11 +97,11 @@
 
   // Shapes for the dots and the three big corners. FANCY ones scanned less reliably in my tests, see the README.
   var SHAPE_NAMES = { square: "Square", rounded: "Rounded", dots: "Round dots", leaf: "Leaf", vbars: "Vertical bars", hbars: "Horizontal bars", diamond: "Diamond", small: "Small squares", plus: "Plus", star: "Star", heart: "Heart" };
-  var FANCY = { diamond: 1, small: 1, plus: 1, star: 1, heart: 1 };
+  var FANCY = { diamond: 1, hbars: 1, plus: 1, star: 1, heart: 1 };
   var EYE_NAMES = { square: "Square", rounded: "Rounded", circle: "Circle", leaf: "Leaf", cut: "Cut corners" };
   function shapePath(st) { return sq(0, 0, 1, st); }
   function eyePath(st) { var e = eye(0, 0, st); return e; }
-  var DEF = { fg: "#000000", bg: "#ffffff", transparent: false, dots: "square", eyes: "square", eyeColor: "", margin: 4, ecc: "M", logo: "", logoSize: 20 };
+  var DEF = { fg: "#000000", bg: "#ffffff", transparent: false, dots: "square", eyes: "square", eyeColor: "", margin: 4, ecc: "Q", logo: "", logoSize: 20 };
 
   // Make the SVG text. text: what to encode. o: options (see DEF).
   function svg(text, opts) {
