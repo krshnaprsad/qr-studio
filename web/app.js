@@ -1,7 +1,13 @@
 (function () {
   var $ = function (s) { return document.querySelector(s); }, kind = "url", logo = "";
   var PH = { url: "https://yourname.com" };
-  var ecReset = true;
+  var ecReset = true, shape = { dots: "square", eyes: "square" };
+  function thumb(path, evenodd) { return '<svg viewBox="' + (evenodd ? "-0.6 -0.6 8.2 8.2" : "-0.15 -0.15 1.3 1.3") + '" width="30" height="30"><path fill="#fff" fill-rule="' + (evenodd ? "evenodd" : "nonzero") + '" d="' + path + '"/></svg>'; }
+  function picker(id, key, names, paths, fancy) {
+    var el = $(id); el.innerHTML = Object.keys(names).map(function (k) { return '<button type="button" class="shp' + (shape[key] === k ? " on" : "") + '" data-k="' + k + '" title="' + names[k] + (fancy[k] ? " (decorative, test it)" : "") + '" aria-label="' + names[k] + '">' + thumb(paths(k), key === "eyes") + "<span>" + names[k] + "</span>" + (fancy[k] ? "<i></i>" : "") + "</button>"; }).join("");
+    el.querySelectorAll(".shp").forEach(function (b) { b.onclick = function () { shape[key] = b.dataset.k; el.querySelectorAll(".shp").forEach(function (x) { x.classList.toggle("on", x === b); }); render(); }; });
+  }
+  function eyeThumb(k) { var e = QRS.eyePath(k); return e.ring + e.mid; }
   function val(id) { return $(id).value; }
   function fields() {
     if (kind === "wifi") return { ssid: val("#ssid"), password: val("#wpass"), security: val("#wsec"), hidden: $("#whid").checked };
@@ -10,7 +16,7 @@
     return { text: val("#text") };
   }
   function opts() {
-    return { fg: val("#fg"), bg: val("#bg"), transparent: $("#tr").checked, dots: val("#dots"), eyes: val("#eyes"), eyeColor: ecReset ? "" : val("#ec"), margin: +val("#margin"), ecc: "M", logo: logo, logoSize: +val("#lsize") };
+    return { fg: val("#fg"), bg: val("#bg"), transparent: $("#tr").checked, dots: shape.dots, eyes: shape.eyes, eyeColor: ecReset ? "" : val("#ec"), margin: +val("#margin"), ecc: "M", logo: logo, logoSize: +val("#lsize") };
   }
   function msg(t) { var m = $("#msg"); m.hidden = !t; m.textContent = t || ""; if (t) setTimeout(function () { m.hidden = true; }, 3000); }
   var cur = "";
@@ -44,6 +50,8 @@
     fr.readAsDataURL(f);
   };
   $("#fg").addEventListener("input", function () { if (ecReset) $("#ec").value = val("#fg"); });
+  picker("#dotpick", "dots", QRS.SHAPE_NAMES, QRS.shapePath, QRS.FANCY);
+  picker("#eyepick", "eyes", QRS.EYE_NAMES, eyeThumb, {});
   window.QRStudio = { render: render };
   render();
 })();
