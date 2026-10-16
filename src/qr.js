@@ -47,15 +47,27 @@
     if (!o.transparent && lum(o.fg) > lum(o.bg)) w.push("Light code on a dark background is inverted. Some scanners cannot read inverted codes. Test it on more than one phone.");
     if (o.logo && o.logoSize > 24) w.push("A big logo hides part of the code. Above about 24 percent it often stops scanning. Make it smaller if a phone struggles.");
     if (o.logo && o.ecc !== "H") w.push("With a logo the code needs the highest repair level (H). Switch it on.");
-    if (o.dots === "dots") w.push("Round dots are harder for a phone to read than squares, more so when the text is long. Test it on your phone before you use it.");
+    if (FANCY[o.dots]) w.push("The " + SHAPE_NAMES[o.dots].toLowerCase() + " shape is decorative and harder for a phone to read than the plain ones. Scan it on your phone before you use it" + (textLength > 120 ? ", and shorten the text if it fails" : "") + ".");
     if (textLength > 600) w.push("That is a lot of text, so the code will be dense and hard to scan from far away. A short link works better.");
     return w;
   }
 
-  // Draw one square: x, y, size, style
+  // Draw one module (a small square of the code) in the chosen shape. x, y: top left, s: size.
   function sq(x, y, s, st) {
-    if (st === "dots") { var r = s / 2; return "M" + (x + r) + " " + y + "a" + r + " " + r + " 0 1 0 .001 0z"; }
-    if (st === "rounded") { var k = s * 0.3, w = s - 2 * k; return "M" + (x + k) + " " + y + "h" + w + "a" + k + " " + k + " 0 0 1 " + k + " " + k + "v" + w + "a" + k + " " + k + " 0 0 1 -" + k + " " + k + "h-" + w + "a" + k + " " + k + " 0 0 1 -" + k + " -" + k + "v-" + w + "a" + k + " " + k + " 0 0 1 " + k + " -" + k + "z"; }
+    var f = function (n) { return +(n * s).toFixed(3); }, X = function (n) { return +(x + n * s).toFixed(3); }, Y = function (n) { return +(y + n * s).toFixed(3); };
+    var P = function (pts) { return "M" + pts.map(function (p) { return X(p[0]) + " " + Y(p[1]); }).join("L") + "z"; };
+    switch (st) {
+      case "dots": return "M" + X(0.5) + " " + y + "a" + f(0.5) + " " + f(0.5) + " 0 1 0 .001 0z";
+      case "rounded": { var k = 0.3, w = 1 - 2 * k; return "M" + X(k) + " " + y + "h" + f(w) + "a" + f(k) + " " + f(k) + " 0 0 1 " + f(k) + " " + f(k) + "v" + f(w) + "a" + f(k) + " " + f(k) + " 0 0 1 -" + f(k) + " " + f(k) + "h-" + f(w) + "a" + f(k) + " " + f(k) + " 0 0 1 -" + f(k) + " -" + f(k) + "v-" + f(w) + "a" + f(k) + " " + f(k) + " 0 0 1 " + f(k) + " -" + f(k) + "z"; }
+      case "diamond": return P([[0.5, -0.12], [1.12, 0.5], [0.5, 1.12], [-0.12, 0.5]]);
+      case "vbars": return P([[0.12, 0], [0.88, 0], [0.88, 1], [0.12, 1]]);
+      case "hbars": return P([[0, 0.12], [1, 0.12], [1, 0.88], [0, 0.88]]);
+      case "small": return P([[0.1, 0.1], [0.9, 0.1], [0.9, 0.9], [0.1, 0.9]]);
+      case "plus": return P([[0.28, 0], [0.72, 0], [0.72, 0.28], [1, 0.28], [1, 0.72], [0.72, 0.72], [0.72, 1], [0.28, 1], [0.28, 0.72], [0, 0.72], [0, 0.28], [0.28, 0.28]]);
+      case "star": { var pts = []; for (var i = 0; i < 10; i++) { var r = i % 2 ? 0.34 : 0.78, an = -Math.PI / 2 + i * Math.PI / 5; pts.push([0.5 + r * Math.cos(an), 0.54 + r * Math.sin(an)]); } return P(pts); }
+      case "heart": return "M" + X(0.5) + " " + Y(1.02) + "C" + X(-0.2) + " " + Y(0.6) + " " + X(-0.08) + " " + Y(-0.02) + " " + X(0.28) + " " + Y(0.0) + "C" + X(0.42) + " " + Y(0.0) + " " + X(0.5) + " " + Y(0.12) + " " + X(0.5) + " " + Y(0.24) + "C" + X(0.5) + " " + Y(0.12) + " " + X(0.58) + " " + Y(0.0) + " " + X(0.72) + " " + Y(0.0) + "C" + X(1.08) + " " + Y(-0.02) + " " + X(1.2) + " " + Y(0.6) + " " + X(0.5) + " " + Y(1.02) + "z";
+      case "leaf": return "M" + X(0.5) + " " + y + "H" + X(1) + "V" + Y(0.5) + "A" + f(0.5) + " " + f(0.5) + " 0 0 1 " + X(0.5) + " " + Y(1) + "H" + x + "V" + Y(0.5) + "A" + f(0.5) + " " + f(0.5) + " 0 0 1 " + X(0.5) + " " + y + "z";
+    }
     return "M" + x + " " + y + "h" + s + "v" + s + "h-" + s + "z";
   }
   // The three big corner squares, drawn as a ring plus a centre
@@ -64,6 +76,10 @@
     if (st === "circle") {
       ring = "M" + (x + 3.5) + " " + y + "a3.5 3.5 0 1 0 .001 0zM" + (x + 3.5) + " " + (y + 1) + "a2.5 2.5 0 1 1 -.001 0z";
       mid = "M" + (x + 3.5) + " " + (y + 2) + "a1.5 1.5 0 1 0 .001 0z";
+    } else if (st === "leaf") {
+      ring = lf(x, y, 7, 2.6) + lf(x + 1, y + 1, 5, 1.8); mid = lf(x + 2, y + 2, 3, 1);
+    } else if (st === "cut") {
+      ring = ct(x, y, 7, 1.6) + ct(x + 1, y + 1, 5, 1); mid = ct(x + 2, y + 2, 3, 0.6);
     } else if (st === "rounded") {
       var o = rr(x, y, 7, 1.8), i = rr(x + 1, y + 1, 5, 1.1);
       ring = o + i; mid = rr(x + 2, y + 2, 3, 0.8);
@@ -73,8 +89,16 @@
     }
     return { ring: ring, mid: mid };
   }
+  function lf(x, y, s, k) { return "M" + (x + k) + " " + y + "H" + (x + s) + "V" + (y + s - k) + "A" + k + " " + k + " 0 0 1 " + (x + s - k) + " " + (y + s) + "H" + x + "V" + (y + k) + "A" + k + " " + k + " 0 0 1 " + (x + k) + " " + y + "z"; }
+  function ct(x, y, s, k) { return "M" + (x + k) + " " + y + "H" + (x + s - k) + "L" + (x + s) + " " + (y + k) + "V" + (y + s - k) + "L" + (x + s - k) + " " + (y + s) + "H" + (x + k) + "L" + x + " " + (y + s - k) + "V" + (y + k) + "z"; }
   function rr(x, y, s, k) { var w = s - 2 * k; return "M" + (x + k) + " " + y + "h" + w + "a" + k + " " + k + " 0 0 1 " + k + " " + k + "v" + w + "a" + k + " " + k + " 0 0 1 -" + k + " " + k + "h-" + w + "a" + k + " " + k + " 0 0 1 -" + k + " -" + k + "v-" + w + "a" + k + " " + k + " 0 0 1 " + k + " -" + k + "z"; }
 
+  // Shapes for the dots and the three big corners. FANCY ones scanned less reliably in my tests, see the README.
+  var SHAPE_NAMES = { square: "Square", rounded: "Rounded", dots: "Round dots", leaf: "Leaf", vbars: "Vertical bars", hbars: "Horizontal bars", diamond: "Diamond", small: "Small squares", plus: "Plus", star: "Star", heart: "Heart" };
+  var FANCY = { diamond: 1, small: 1, plus: 1, star: 1, heart: 1 };
+  var EYE_NAMES = { square: "Square", rounded: "Rounded", circle: "Circle", leaf: "Leaf", cut: "Cut corners" };
+  function shapePath(st) { return sq(0, 0, 1, st); }
+  function eyePath(st) { var e = eye(0, 0, st); return e; }
   var DEF = { fg: "#000000", bg: "#ffffff", transparent: false, dots: "square", eyes: "square", eyeColor: "", margin: 4, ecc: "M", logo: "", logoSize: 20 };
 
   // Make the SVG text. text: what to encode. o: options (see DEF).
@@ -102,5 +126,5 @@
     return out + "</svg>";
   }
 
-  return { payload: payload, matrix: matrix, svg: svg, contrast: contrast, warnings: warnings, DEF: DEF };
+  return { SHAPE_NAMES: SHAPE_NAMES, EYE_NAMES: EYE_NAMES, FANCY: FANCY, shapePath: shapePath, eyePath: eyePath, payload: payload, matrix: matrix, svg: svg, contrast: contrast, warnings: warnings, DEF: DEF };
 });
