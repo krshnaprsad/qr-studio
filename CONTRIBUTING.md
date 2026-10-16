@@ -16,4 +16,6 @@ Layout:
 
 To check a change really scans, render the SVG and decode it with a reader such as jsQR. A test that only checks the SVG text cannot tell you that a phone will read it.
 
-Options for `QRS.svg`: `fg`, `bg`, `transparent`, `dots` (square, rounded, dots), `eyes` (square, rounded, circle), `eyeColor`, `margin`, `ecc` (L, M, Q, H), `logo` (a data URI), `logoSize` (percent of the width).
+Options for `QRS.svg`: `fg`, `bg`, `transparent`, `dots` (square, rounded, dots, leaf, vbars, hbars, diamond, small, plus, star, heart), `eyes` (square, rounded, circle, leaf, cut), `eyeColor`, `margin`, `ecc` (L, M, Q, H), `logo` (a data URI), `logoSize` (percent of the width).
+
+To add a shape, add a case to `sq()` in `src/qr.js` and a name in `SHAPE_NAMES`. If it is decorative, add it to `FANCY` so the tool warns. Then decode it with a reader at a few sizes before you call it reliable, a shape that only looks right is not enough.
