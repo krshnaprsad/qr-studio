@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="web/app.css">
 </head>
 <body>
-<header class="hd"><span class="logo" role="img" aria-label="Zero3 Creatives"></span><div><h1>QR Studio</h1><p class="tag">QR codes with your colours and your logo</p></div><span class="ver">v1.0</span></header>
+<header class="hd"><span class="logo" role="img" aria-label="Zero3 Creatives"></span><div><h1>QR Studio</h1><p class="tag">QR codes with your colours and your logo</p></div><span class="ver">v1.1</span></header>
 <main>
   <div class="grid">
     <section class="card">
@@ -23,10 +23,11 @@
         <label>Code colour<input type="color" id="fg" value="#000000"></label>
         <label>Background<input type="color" id="bg" value="#ffffff"></label>
         <label>Corner colour<span class="inl"><input type="color" id="ec" value="#000000"><button class="lnk" id="ecreset">same as code</button></span></label>
-        <label>Dots<select id="dots"><option value="square">Square</option><option value="rounded">Rounded</option><option value="dots">Round dots</option></select></label>
-        <label>Corners<select id="eyes"><option value="square">Square</option><option value="rounded">Rounded</option><option value="circle">Circle</option></select></label>
-        <label>Border<select id="margin"><option value="2">Thin</option><option value="4" selected>Normal</option><option value="6">Wide</option></select></label>
+                <label>Border<select id="margin"><option value="2">Thin</option><option value="4" selected>Normal</option><option value="6">Wide</option></select></label>
       </div>
+      <h3>Dot shape</h3><div class="shapes" id="dotpick"></div>
+      <h3>Corner shape</h3><div class="shapes" id="eyepick"></div>
+      <p class="note">Shapes marked with a small dot are decorative and harder for phones to read. The tool warns you, but always scan the result.</p>
       <label class="chk"><input type="checkbox" id="tr"> Transparent background (PNG and SVG)</label>
 
       <h2 class="gap">3. Logo (optional)</h2>
