@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="web/app.css">
 </head>
 <body>
-<header class="hd"><span class="logo" role="img" aria-label="Zero3 Creatives"></span><div><h1>QR Studio</h1><p class="tag">QR codes with your colours and your logo</p></div><span class="ver">v1.1.1</span></header>
+<header class="hd"><span class="logo" role="img" aria-label="Zero3 Creatives"></span><div><h1>QR Studio</h1><p class="tag">QR codes with your colours and your logo</p></div><span class="ver">v1.2</span></header>
 <main>
   <div class="grid">
     <section class="card">
@@ -37,6 +37,7 @@
     <section class="card prev">
       <h2>Your code</h2>
       <div class="box" id="box"><div id="art"></div></div>
+      <div id="chk" class="chk"></div>
       <div id="warn"></div>
       <div class="row"><button class="btn go" id="dpng">Download PNG</button><button class="btn" id="dsvg">Download SVG</button><select id="psize" class="sm" aria-label="PNG size"><option value="512">512 px</option><option value="1024" selected>1024 px</option><option value="2048">2048 px</option></select></div>
       <p class="note">SVG stays sharp at any size, use it for print. PNG is for screens and chat apps.</p>
@@ -46,6 +47,7 @@
   <p class="foot">Everything runs in your browser. What you type and the logo you add are not sent anywhere. Made by Zero3. <a href="https://github.com/krshnaprsad/qr-studio" target="_blank" rel="noopener">Source on GitHub</a></p>
 </main>
 <script src="vendor/qrcode.js"></script>
+<script src="vendor/jsqr.js"></script>
 <script src="src/qr.js"></script>
 <script src="web/app.js"></script>
 </body>
