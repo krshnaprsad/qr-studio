@@ -28,14 +28,16 @@
     try { cur = QRS.svg(text, o); } catch (e) { cur = ""; art.innerHTML = '<p class="note empty">That is too much for one QR code. Shorten it.</p>'; w.innerHTML = ""; setDl(false); return; }
     art.innerHTML = cur; setDl(true);
     var list = QRS.warnings(Object.assign({}, o, { ecc: o.logo ? "H" : o.ecc }), text.length);
+    var inv = !o.transparent && QRS.isInverted(o);
     w.innerHTML = list.length ? '<ul class="warn">' + list.map(function (x) { return "<li>" + x.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</li>"; }).join("") + "</ul>" : '<p class="ok">No problems spotted. Still scan it with your phone before you print it.</p>';
+    if (inv) { var b = document.createElement("button"); b.type = "button"; b.textContent = "Swap colours"; b.onclick = function () { var f = $("#fg"), g = $("#bg"), t = f.value; f.value = g.value; g.value = t; render(); }; w.appendChild(b); }
   }
   function setDl(on) { $("#dpng").disabled = $("#dsvg").disabled = !on; }
   function save(blob, name) { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000); }
-  $("#dsvg").onclick = function () { if (cur) { save(new Blob([cur], { type: "image/svg+xml" }), "qr-code.svg"); msg("SVG saved."); } };
+  $("#dsvg").onclick = function () { if (cur) { save(new Blob([cur], { type: "image/svg+xml" }), "qr-code.svg"); msg(!opts().transparent && QRS.isInverted(opts()) ? "SVG saved. This code is light on dark, so many phones may not scan it." : "SVG saved."); } };
   $("#dpng").onclick = function () {
     if (!cur) return; var px = +val("#psize"), img = new Image();
-    img.onload = function () { var c = document.createElement("canvas"); c.width = c.height = px; var g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.drawImage(img, 0, 0, px, px); c.toBlob(function (b) { save(b, "qr-code.png"); msg("PNG saved."); }, "image/png"); };
+    img.onload = function () { var c = document.createElement("canvas"); c.width = c.height = px; var g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.drawImage(img, 0, 0, px, px); c.toBlob(function (b) { save(b, "qr-code.png"); msg(!opts().transparent && QRS.isInverted(opts()) ? "PNG saved. This code is light on dark, so many phones may not scan it." : "PNG saved."); }, "image/png"); };
     img.onerror = function () { msg("Could not make the PNG. Try the SVG."); };
     img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(cur);
   };
