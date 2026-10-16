@@ -8,7 +8,7 @@ Made by Zero3.
 
 I wanted a QR code maker that does not hand me a plain black square, does not push me into a paid plan after one code, and does not send my link to a server. So I built one.
 
-You type a link or text, pick the colours, the dot shape and the corner shape, optionally drop your logo in the middle, and download it as SVG or PNG.
+You type a link or text, pick the colours, the dot shape (11 to choose from) and the corner shape (5), optionally drop your logo in the middle, and download it as SVG or PNG.
 
 It makes four kinds of code: a link or any text, a Wi-Fi network (scan to join), an email, and a phone number.
 
@@ -22,7 +22,7 @@ Or download the repo and open `index.html`. Nothing to install and nothing leave
 
 - **Always scan it before you print it.** The tool warns about the usual problems (colours too close, a light code on a dark background, a logo that is too big) but a warning is a guess, and only a real phone tells you the truth. Test on more than one phone if it matters.
 - **A logo hides part of the code.** When you add one I switch the code to its highest repair level so it still reads. Above about a quarter of the width it often stops scanning.
-- **Round dots look nice and read worse than squares.** Fine for a short link, riskier for long text.
+- **Some shapes read better than others.** Square, rounded, round dots, leaf, vertical bars and horizontal bars were reliable in my tests. Diamond, small squares, plus, star and heart are decorative. They looked great but failed more often, so the tool warns you when you pick one. All five corner shapes read fine.
 - **Light on dark can fail.** Some scanners cannot read inverted codes.
 - **A QR code can only hold so much.** If the text is too long you get a message and no code.
 - **A Wi-Fi code holds the password in plain text.** Anyone who scans it can join. Share it only where that is fine.
@@ -31,7 +31,13 @@ Or download the repo and open `index.html`. Nothing to install and nothing leave
 
 ## How I checked it
 
-The tests cover what gets written into each kind of code and the warnings. Separately, I rendered 72 combinations of text, dot shape, corner shape and logo and decoded each one with jsQR, a free reader. 69 read back exactly. The 3 that did not were round dots on a long text with non-English characters and no logo. That matches the warning above. A real phone is still the final test.
+The tests cover what gets written into each kind of code, every shape, and the warnings. Separately, I rendered every dot shape and every corner shape, with and without a logo, on four different texts, and decoded each one with jsQR, a free reader. I did it three ways: sharp at 300 and 200 pixels, and at 600 pixels with a slight blur to act like a camera.
+
+- Square, rounded, round dots, leaf, vertical bars and horizontal bars: 144 of 144 read back exactly.
+- All five corner shapes: 120 of 120.
+- Diamond, small squares, plus, star and heart: 100 of 120. Plus and star failed the most, and some shapes only failed with a logo or at one size.
+
+jsQR is a stricter reader than most phone cameras in some ways and weaker in others, so these numbers are a guide, not a promise. A real phone is still the final test, and I have not tried one.
 
 ## Files
 
