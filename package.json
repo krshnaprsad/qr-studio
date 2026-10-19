@@ -2,7 +2,7 @@
   "name": "qr-studio",
   "version": "1.2.0",
   "description": "QR codes with your own colours, shapes and logo. Runs in the browser, exports SVG and PNG.",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "author": "Krishna Prasad",
   "engines": { "node": ">=18" },
   "scripts": { "test": "node tests/qr.test.js" }
