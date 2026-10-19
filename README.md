@@ -2,7 +2,7 @@
 
 QR codes with your own colours, shapes and logo.
 
-Made by Zero3.
+Made by [Zero3](https://www.zero3creatives.net/).
 
 ## Why I built QR Studio
 
