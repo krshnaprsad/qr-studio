@@ -1,6 +1,6 @@
 {
   "name": "qr-studio",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "QR codes with your own colours, shapes and logo. Runs in the browser, exports SVG and PNG.",
   "license": "SEE LICENSE IN LICENSE",
   "author": "Krishna Prasad",
