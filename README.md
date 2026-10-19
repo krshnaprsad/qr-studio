@@ -4,6 +4,10 @@ QR codes with your own colours, shapes and logo.
 
 Made by Zero3.
 
+## Why I built QR Studio
+
+Sometimes a client needs a QR code. I make one from their website, and when it is scanned it opens that website, doing exactly what the QR code is for. It also works with my phone number: scan the code and it calls me, or opens WhatsApp. Anything a QR code is needed for, QR Studio does it.
+
 ## What it does
 
 I wanted a QR code maker that does not hand me a plain black square, does not push me into a paid plan after one code, and does not send my link to a server. So I built one.
